@@ -7,6 +7,8 @@ library("DT")
 library("shinyWidgets")
 library("shinycssloaders")
 library("ggplot2")
+library("jsonlite")
+
 ########################
 getColumnDefinitions = function(fc) {
     do.call("rbind",lapply(fc$featureType[[1]]$carrierOfCharacteristics,function(x){data.frame(MemberCode=ifelse(!is.null(x$code),x$code,""),
@@ -220,17 +222,19 @@ server <- function(input, output, session) {
              
          }
         
+        meta<-if (!is.null(query$dsd)){
+            jsonlite::fromJSON(query$dsd)
+        }else{
+            NULL
+            
+        }
+        
+        if(!is.null(meta)){
+        names(meta)<-c("MemberName","Definition","MemberCode","PrimitiveType","MemberType","MinOccurs","MaxOccurs","MeasureUnitSymbol","MeasureUnitName")
+        }
         if(!is.null(layer)&!is.null(wfs_server)&!is.null(wfs_version)&!is.null(strategy)){
             
-             # #Connect to OGC CSW Catalogue to get METADATA
-              CSW <- CSWClient$new(
-                  url = "https://geonetwork-sdi-lab.d4science.org/geonetwork/srv/eng/csw",
-                  serviceVersion = "2.0.2",
-                  logger = "INFO"
-              )
-             # #Get metadata for dataset
-            #  md <- CSW$getRecordById(pid, outputSchema = "http://www.isotc211.org/2005/gmd")
-              fc <- CSW$getRecordById(paste0(pid,"_dsd"), outputSchema = "http://www.isotc211.org/2005/gfc")
+             
             #Connect to OGC WFS to get DATA
             WFS <- WFSClient$new(
                 url = wfs_server,
@@ -358,7 +362,19 @@ server <- function(input, output, session) {
               output$plot2 <- renderPlot({
               ggplot(data.sp,aes(x=data.sp$time,y=data.sp[,input$ycol3]))+geom_point()+labs(x="Time serie",y=input$ycol3)
               })
-            meta<-getColumnDefinitions(fc)
+              
+             if(is.null(meta)){ 
+                 # #Connect to OGC CSW Catalogue to get METADATA
+                 CSW <- CSWClient$new(
+                     url = "https://geonetwork-sdi-lab.d4science.org/geonetwork/srv/eng/csw",
+                     serviceVersion = "2.0.2",
+                     logger = "INFO"
+                 )
+                 # #Get metadata for dataset
+                 #  md <- CSW$getRecordById(pid, outputSchema = "http://www.isotc211.org/2005/gmd")
+                 fc <- CSW$getRecordById(paste0(pid,"_dsd"), outputSchema = "http://www.isotc211.org/2005/gfc")
+                meta<-getColumnDefinitions(fc)}
+              
             test<-as.data.frame(data.sf)
             test<-t(test)
             test<-as.data.frame(test)
@@ -379,7 +395,7 @@ server <- function(input, output, session) {
           #                           options = list(autoWidth = TRUE, bSort = FALSE),class = "cell-border stripe")
               
             #output$table <- renderDT(t(as.data.frame(data.sf)), options = list(lengthChange = FALSE))
-            output$table <- renderDT(test2, options = list(lengthChange = FALSE,
+            output$table <- renderDT(test2,colnames = '', options = list(dom = 't',lengthChange = FALSE,
                                                            rowCallback = JS(
                                                                "function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {",
                                                                "var full_text = aData[",
