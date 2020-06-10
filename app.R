@@ -231,6 +231,7 @@ server <- function(input, output, session) {
         
         if(!is.null(meta)){
         names(meta)<-c("MemberName","Definition","MemberCode","PrimitiveType","MemberType","MinOccurs","MaxOccurs","MeasureUnitSymbol","MeasureUnitName")
+        meta[is.na(meta)]<-""
         }
         if(!is.null(layer)&!is.null(wfs_server)&!is.null(wfs_version)&!is.null(strategy)){
             
