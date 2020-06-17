@@ -34,22 +34,31 @@ options(spinner.color="#0275D8", spinner.color.background="#ffffff", spinner.siz
 
 #taille popup :max=
 ui <- fluidPage(
+    tags$head(tags$link(rel="stylesheet", type="text/css", href="popup.css")),
     fluidRow(
         column(
             width = 4,
-            tags$h4("Sdilab popup select by url query"),
-            tags$img(src="https://www.blue-cloud.org/sites/all/themes/arcadia/logo.png",height=30,align = "right"),   
+            tags$h4("Sdilab popup",
+            tags$img(src="https://www.blue-cloud.org/sites/all/themes/arcadia/logo.png",height=28,align = "right")),   
             br(),
+            #radioGroupButtons(
+            #    inputId = "visuBtn",
+            #    label = "Type of visual:",
+            #    choices = c(Data = "table",Plot="plot",'Time serie'="timeserie",'Request info'="queryText"),
+            #    selected ="table",
+            #    status = "sucess"
+            #),
             radioGroupButtons(
                 inputId = "visuBtn",
                 label = "Type of visual:",
-                choices = c(Data = "table",Plot="plot",'Time serie'="timeserie",'Request info'="queryText"),
+                choices = c(Data = "table",'Request info'="queryText"),
                 selected ="table",
-                status = "sucess"
+                size="normal",
+                status = "info"
             ),
             conditionalPanel(
                 condition = "input.visuBtn == 'table'",
-                DTOutput('table')%>%withSpinner(type = 2)),
+                div(DTOutput('table')%>%withSpinner(type = 2),  style = "font-size:80%")),
             
             conditionalPanel(
                 condition = "input.visuBtn=='queryText'",
@@ -382,7 +391,7 @@ server <- function(input, output, session) {
             #names(test)<-paste0("V",names(test))
             test$MemberCode<-rownames(test)
             test2<-merge(test,subset(meta,select=c(MemberCode,MemberName,Definition,MeasureUnitSymbol)))
-            rownames(test2)<-paste0(test2$MemberName,"[",test2$MemberCode,"]")
+            rownames(test2)<-paste0(test2$MemberName," [",test2$MemberCode,"]")
             #lapply(grep("V",ff,value=T))
             for(i in grep("V",names(test2),value=T)){
                 test2[,i]<-paste(test2[,i],test2$MeasureUnitSymbol,sep=" ")    
