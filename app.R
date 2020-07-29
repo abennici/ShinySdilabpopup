@@ -22,13 +22,7 @@ getColumnDefinitions = function(fc) {
                                                                                                MeasureUnitName=ifelse(!is.null(x$valueMeasurementUnit$name$value),x$valueMeasurementUnit$name$value,""))}))
 }   
 ###
-# #Connect to OGC CSW Catalogue to get METADATA
-CSW <- CSWClient$new(
-    url = "https://geonetwork-sdi-lab.d4science.org/geonetwork/srv/eng/csw",
-    serviceVersion = "2.0.2",
-    logger = "INFO"
-)
-#######################
+######################
 # Options for Spinner
 options(spinner.color="#0275D8", spinner.color.background="#ffffff", spinner.size=1)
 
@@ -152,6 +146,8 @@ server <- function(input, output, session) {
                   "layer: ", query$layer, "\n",
                   "wfs_server: ",query$wfs_server, "\n",
                   "wfs_version: ", query$wfs_version, "\n",
+                  "csw_server: ",query$csw_server, "\n",
+                  "csw_version: ", query$csw_version, "\n",
                   "strategy: ", query$strategy, "\n",
                   "par: ", query$par, "\n",
                   "geom: ", query$geom, "\n",
@@ -186,6 +182,20 @@ server <- function(input, output, session) {
             as.character(query$wfs_version)
         }else{
             NULL
+            
+        }
+        
+        csw_server <-if (!is.null(query$csw_server)){
+            as.character(query$csw_server)
+        }else{
+            "https://geonetwork-sdi-lab.d4science.org/geonetwork/srv/eng/csw"
+            
+        }
+        
+        csw_version <-if (!is.null(query$csw_version)){
+            as.character(query$csw_version)
+        }else{
+            "2.0.2"
             
         }
         
@@ -376,8 +386,8 @@ server <- function(input, output, session) {
              if(is.null(meta)){ 
                  # #Connect to OGC CSW Catalogue to get METADATA
                  CSW <- CSWClient$new(
-                     url = "https://geonetwork-sdi-lab.d4science.org/geonetwork/srv/eng/csw",
-                     serviceVersion = "2.0.2",
+                     url = csw_server,
+                     serviceVersion = csw_version,
                      logger = "INFO"
                  )
                  # #Get metadata for dataset
