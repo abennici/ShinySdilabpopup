@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libproj-dev \
     libgeos-dev \
     libgdal-dev \
-    libcurl4-openssl \
+    libcurl4-openssl_dev \
     libxml2 \
     libxml2-dev \
     git 
