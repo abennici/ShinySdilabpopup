@@ -6,7 +6,6 @@ library("shiny")
 library("DT")
 library("shinyWidgets")
 library("shinycssloaders")
-library("ggplot2")
 library("jsonlite")
 
 #load module functions
