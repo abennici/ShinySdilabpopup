@@ -28,7 +28,7 @@ RUN wget https://cran.r-project.org/src/contrib/Archive/XML/XML_3.99-0.3.tar.gz
 RUN R -e "install.packages('XML_3.99-0.3.tar.gz', repos = NULL, type = 'source')"
 # install dependencies of the Sdilab popup app
 
-RUN R -e "install.packages(c('ggplot2','R6', 'httr', 'openssl','sf','rgdal','geometa','ows4R','shiny','DT','shinyWidgets','shinycssloaders','jsonlite','remotes'), repos='http://cran.r-project.org')"
+RUN R -e "install.packages(c('R6', 'httr', 'openssl','sf','rgdal','geometa','ows4R','shiny','DT','shinyWidgets','shinycssloaders','jsonlite','remotes'), repos='http://cran.r-project.org')"
 RUN R -e "remotes::install_github('daattali/shinycssloaders')"
 
 RUN git -C /root/ clone https://github.com/abennici/ShinySdilabpopup.git && echo "OK!"
@@ -36,8 +36,6 @@ RUN mkdir -p /srv/shiny/
 RUN ln -s /root/ShinySdilabpopup /srv/shiny/ShinySdilabpopup
  
 EXPOSE 3838
-
-ENV SMT_LOG=session.log
 
 RUN apt-get install -y curl
 CMD ["R", "-e shiny::runApp('/srv/shiny/ShinySdilabpopup',port=3838,host='0.0.0.0')"]
