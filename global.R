@@ -9,9 +9,8 @@ library("shinycssloaders")
 library("jsonlite")
 
 #load module functions
-source("modules/QueryInfo.R")
+source("https://raw.githubusercontent.com/eblondel/OpenFairViewer/master/src/resources/shinyModule/QueryInfo.R")
 source("modules/DataTable.R")
-source("functions.R")
 source("ui.R")
 source("server.R")
 
