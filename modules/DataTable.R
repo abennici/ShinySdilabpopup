@@ -10,31 +10,31 @@ DataTableUI <- function(id) {
 }
 
 # Function for module server logic
-DataTable <- function(input, output, session,data.sf,meta) {
+DataTable <- function(input, output, session,data,dsd) {
   observe({
-    test<-as.data.frame(data.sf())
-    test<-t(test)
-    test<-as.data.frame(test)
+    tab<-as.data.frame(data())
+    tab<-t(tab)
+    tab<-as.data.frame(tab)
     print(meta())
-    test$MemberCode<-rownames(test)
-    test2<-merge(test,subset(meta(),select=c(MemberCode,MemberName,Definition,MeasureUnitSymbol)))
-    rownames(test2)<-paste0(test2$MemberName," [",test2$MemberCode,"]")
+    tab$MemberCode<-rownames(tab)
+    tab2<-merge(tab,subset(dsd(),select=c(MemberCode,MemberName,Definition,MeasureUnitSymbol)))
+    rownames(tab2)<-paste0(tab2$MemberName," [",tab2$MemberCode,"]")
     
-    for(i in grep("V",names(test2),value=T)){
-      test2[,i]<-paste(test2[,i],test2$MeasureUnitSymbol,sep=" ")    
+    for(i in grep("V",names(tab2),value=T)){
+      tab2[,i]<-paste(tab2[,i],tab2$MeasureUnitSymbol,sep=" ")    
     }
     
-    test2<-subset(test2,selec=-c(MemberCode,MemberName,MeasureUnitSymbol))
+    tab2<-subset(tab2,selec=-c(MemberCode,MemberName,MeasureUnitSymbol))
     
-    output$table <- renderDT(test2,colnames = '', options = list(dom = 't',lengthChange = FALSE,
+    output$table <- renderDT(tab2,colnames = '', options = list(dom = 't',lengthChange = FALSE,
                                                                  rowCallback = JS(
                                                                    "function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {",
                                                                    "var full_text = aData[",
-                                                                   ncol(test2),
+                                                                   ncol(tab2),
                                                                    "]",
                                                                    "$('td:eq(0)', nRow).attr('title', full_text);",
                                                                    "}"),
-                                                                 columnDefs = list(list(visible=FALSE, targets=ncol(test2)))))
+                                                                 columnDefs = list(list(visible=FALSE, targets=ncol(tab2)))))
      
 })
 }
